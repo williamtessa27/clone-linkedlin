@@ -38,17 +38,17 @@ export const signup = async (req, res) => {
 
 		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "3d" });
 
-		res.cookie("jwt-linkedin", token, {
+		res.cookie("token", token, {
 			httpOnly: true, // prevent XSS attack
 			maxAge: 3 * 24 * 60 * 60 * 1000,
 			sameSite: "strict", // prevent CSRF attacks,
 			secure: process.env.NODE_ENV === "production", // prevents man-in-the-middle attacks
 		});
 
-		res.status(201).json({ message: "User registered successfully" });
-
+		 res.status(201).json({ message: "User registered successfully" });
+		
 		const profileUrl = process.env.CLIENT_URL + "/profile/" + user.username;
-
+		
 		try {
 			await sendWelcomeEmail(user.email, user.name, profileUrl);
 		} catch (emailError) {
@@ -78,7 +78,7 @@ export const login = async (req, res) => {
 
 		// Create and send token
 		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "3d" });
-		await res.cookie("jwt-linkedin", token, {
+		await res.cookie("token", token, {
 			httpOnly: true,
 			maxAge: 3 * 24 * 60 * 60 * 1000,
 			sameSite: "strict",
@@ -93,7 +93,7 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-	res.clearCookie("jwt-linkedin");
+	res.clearCookie("token");
 	res.json({ message: "Logged out successfully" });
 };
 
